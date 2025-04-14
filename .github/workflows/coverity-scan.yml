@@ -23,20 +23,21 @@ jobs:
 
       - name: Download Coverity Tools
         run: |
-          Invoke-WebRequest -Uri https://scan.coverity.com/download/cxx/windows64 \
-            -OutFile coverity_tool.zip -Headers @{Authorization=("token " + "${{ secrets.COVERITY_SCAN_TOKEN }}")}
-          Expand-Archive -Path coverity_tool.zip -DestinationPath coverity
+          $headers = @{ Authorization = "token ${{ secrets.COVERITY_SCAN_TOKEN }}" }
+          Invoke-WebRequest -Uri "https://scan.coverity.com/download/cxx/windows64" -OutFile "coverity_tool.zip" -Headers $headers
+          Expand-Archive -Path "coverity_tool.zip" -DestinationPath "coverity"
 
       - name: Run Coverity Build
         run: |
-          .\coverity\cov-analysis-win64-*.*.*\bin\cov-build.exe --dir cov-int dotnet build CoverityTestProject.csproj --configuration Release
-          tar -czf coverity-scan.tgz cov-int
+          $covPath = Get-ChildItem -Path "coverity" -Directory | Select-Object -First 1
+          & ".\coverity\$($covPath.Name)\bin\cov-build.exe" --dir cov-int dotnet build CoverityTestProject.csproj --configuration Release
+          Compress-Archive -Path cov-int -DestinationPath coverity-scan.zip
 
       - name: Upload to Coverity
         run: |
           curl --form token=${{ secrets.COVERITY_SCAN_TOKEN }} `
                --form email=${{ secrets.COVERITY_SCAN_EMAIL }} `
-               --form file=@coverity-scan.tgz `
+               --form file=@coverity-scan.zip `
                --form version="1.0" `
                --form description="Simple C# Console App Coverity Scan" `
-               https://scan.coverity.com/builds?project=your-github-username%2FCoverityTestProject
+               https://scan.coverity.com/builds?project=Jubayer38%2FCoverityTestProject
