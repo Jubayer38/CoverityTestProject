@@ -21,18 +21,20 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Download Coverity Tools
+      - name: Build project (Check if it compiles before Coverity scan)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Download Coverity Analysis Tool
         run: |
-          $headers = @{ Authorization = "token GJRkD_FHOmUxzr_cfdeghQ" }
-          Invoke-WebRequest -Uri "https://scan.coverity.com/download/cxx/windows64" -OutFile "coverity_tool.zip" -Headers $headers
-          Expand-Archive -Path "coverity_tool.zip" -DestinationPath "coverity"
+          wget --post-data "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" -O coverity_tool.tgz https://scan.coverity.com/download/linux64
+          tar -xvzf coverity_tool.tgz
 
       - name: Run Coverity Build
         run: |
-          $covPath = Get-ChildItem -Path "coverity" -Directory | Select-Object -First 1
-          & ".\coverity\$($covPath.Name)\bin\cov-build.exe" --dir cov-int dotnet build CoverityTestProject.csproj --configuration Release
-          Compress-Archive -Path cov-int -DestinationPath coverity-scan.zip
+          ./cov-analysis*/bin/cov-build --dir cov-int dotnet build --configuration Release
 
+      - name: Compress analysis results
+        run: tar czvf cov-int.tgz cov-int
       - name: Upload to Coverity
         run: |
           curl --form token=GJRkD_FHOmUxzr_cfdeghQ `
