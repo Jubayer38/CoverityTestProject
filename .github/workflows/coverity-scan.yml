@@ -23,7 +23,7 @@ jobs:
 
       - name: Download Coverity Tools
         run: |
-          $headers = @{ Authorization = "token WRhzn0QSofeFvCVT5d2M2g" }
+          $headers = @{ Authorization = "token GJRkD_FHOmUxzr_cfdeghQ" }
           Invoke-WebRequest -Uri "https://scan.coverity.com/download/cxx/windows64" -OutFile "coverity_tool.zip" -Headers $headers
           Expand-Archive -Path "coverity_tool.zip" -DestinationPath "coverity"
 
@@ -35,7 +35,7 @@ jobs:
 
       - name: Upload to Coverity
         run: |
-          curl --form token=WRhzn0QSofeFvCVT5d2M2g `
+          curl --form token=GJRkD_FHOmUxzr_cfdeghQ `
                --form email=mdjubayerhasan264@gmail.com `
                --form file=@coverity-scan.zip `
                --form version="1.0" `
