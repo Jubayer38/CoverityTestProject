@@ -37,10 +37,10 @@ jobs:
         run: tar czvf cov-int.tgz cov-int
       - name: Upload to Coverity
         run: |
-          curl --form token=GJRkD_FHOmUxzr_cfdeghQ `
-               --form email=mdjubayerhasan264@gmail.com `
-               --form file=@coverity-scan.zip `
-               --form version="1.0" `
-               --form description="Simple C# Console App Coverity Scan" `
-               https://scan.coverity.com/builds?project=Jubayer38%2FCoverityTestProject
+          curl --form token=${{ secrets.COVERITY_TOKEN }} \
+               --form email="mdjubayerhasan264@gmail.com" \
+               --form file=@cov-int.tgz \
+               --form version="v1.0.0" \
+               --form description="C# .NET Project Scan" \
+               https://scan.coverity.com/builds?project=${{ github.repository }}
 
