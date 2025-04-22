@@ -1,70 +1,45 @@
-using System;
+﻿using System;
 
 class Program
 {
     static void Main(string[] args)
     {
-        //Unused variable
-        int useless = 45;
+        string studentName = null; // CWE-476: NULL Pointer Dereference
+        Console.WriteLine($"Student Name Length: {studentName.Length}"); // 🔥 NullReferenceException
 
-        string studentName = "Sophia Johnson";
-        string course1Name = "English 101";
-        string course2Name = "Algebra 101";
-        string course3Name = "Biology 101";
-        string course4Name = "Computer Science I";
-        string course5Name = "Psychology 101";
+        int[] grades = new int[5];
+        grades[5] = 100; // CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer (Array Index Out of Bounds)
 
-        int course1Credit = 3;
-        int course2Credit = 3;
-        int course3Credit = 4;
-        int course4Credit = 4;
-        int course5Credit = 3;
+        string[] courseNames = new string[5];
+        Console.WriteLine(courseNames[0].ToUpper()); // CWE-476 again: Null pointer dereference
 
-        int gradeA = 4;
-        int gradeB = 3;
-
-        int course1Grade = gradeA;
-        int course2Grade = gradeB;
-        int course3Grade = gradeB;
-        int course4Grade = gradeB;
-        int course5Grade = gradeA;
-
-        int totalCreditHours = 0;
-
-        totalCreditHours += course1Credit;
-        totalCreditHours += course2Credit;
-        totalCreditHours += course3Credit;
-        totalCreditHours += course4Credit;
-        totalCreditHours += course5Credit;
-
+        int totalCredits = 0;
         int totalGradePoints = 0;
 
-        totalGradePoints += course1Grade * course1Credit;
-        totalGradePoints += course2Grade * course2Credit;
-        totalGradePoints += course3Grade * course3Credit;
-        totalGradePoints += course4Grade * course4Credit;
-        totalGradePoints += course5Grade * course5Credit;
+        // CWE-561: Dead Code
+        if (false)
+        {
+            Console.WriteLine("This code is never executed.");
+        }
 
-        //Divided by zero (0)
-        int fakeTotalHours = 0;
-        decimal unsafeGPA = (decimal)totalGradePoints / fakeTotalHours;
+        // CWE-563: Assignment to Variable without Use
+        int unusedVar = 5;
 
-        decimal gradePointAverage = (decimal)totalGradePoints / totalCreditHours;
+        // CWE-190: Integer Overflow (if unchecked, but simulated here)
+        int large = int.MaxValue;
+        int result = large + 1;
+        Console.WriteLine($"Overflow result: {result}");
 
-        int leadingDigit = (int)gradePointAverage;
-        int firstDigit = (int)(gradePointAverage * 10) % 10;
-        int secondDigit = (int)(gradePointAverage * 100) % 10;
+        // CWE-398: Poor Code Quality (confusing output, unused logic)
+        string course = "Math";
+        if (course == "Math")
+        {
+            course = "Biology";
+        }
+        Console.WriteLine($"Course: {course}"); // Poor readability / design
 
-        Console.WriteLine($"Student: {studentName}\n");
-        Console.WriteLine("Course\t\t\t\tGrade\tCredit Hours");
-
-        Console.WriteLine($"{course1Name}\t\t\t{course1Grade}\t\t{course1Credit}");
-        Console.WriteLine($"{course2Name}\t\t\t{course2Grade}\t\t{course2Credit}");
-        Console.WriteLine($"{course3Name}\t\t\t{course3Grade}\t\t{course3Credit}");
-        Console.WriteLine($"{course4Name}\t{course4Grade}\t\t{course4Credit}");
-        Console.WriteLine($"{course5Name}\t\t{course5Grade}\t\t{course5Credit}");
-
-        Console.WriteLine($"\nFinal GPA:\t\t\t{leadingDigit}.{firstDigit}{secondDigit}");
-        
+        // CWE-259: Use of Hard-coded Password
+        string password = "admin123";
+        Console.WriteLine("Hardcoded password used: " + password);
     }
 }
