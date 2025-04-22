@@ -4,6 +4,9 @@ class Program
 {
     static void Main(string[] args)
     {
+        //Unused variable
+        int useless = 45;
+
         string studentName = "Sophia Johnson";
         string course1Name = "English 101";
         string course2Name = "Algebra 101";
@@ -41,6 +44,10 @@ class Program
         totalGradePoints += course3Grade * course3Credit;
         totalGradePoints += course4Grade * course4Credit;
         totalGradePoints += course5Grade * course5Credit;
+
+        //Divided by zero (0)
+        int fakeTotalHours = 0;
+        decimal unsafeGPA = (decimal)totalGradePoints / fakeTotalHours;
 
         decimal gradePointAverage = (decimal)totalGradePoints / totalCreditHours;
 
