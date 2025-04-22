@@ -7,7 +7,7 @@ on:
 
 jobs:
   coverity:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -21,23 +21,26 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Download Coverity Tools
+      - name: Build project (Check if it compiles before Coverity scan)
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Download Coverity Analysis Tool
         run: |
-          $headers = @{ Authorization = "token ${{ secrets.COVERITY_SCAN_TOKEN }}" }
-          Invoke-WebRequest -Uri "https://scan.coverity.com/download/cxx/windows64" -OutFile "coverity_tool.zip" -Headers $headers
-          Expand-Archive -Path "coverity_tool.zip" -DestinationPath "coverity"
+          wget --post-data "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" -O coverity_tool.tgz https://scan.coverity.com/download/linux64
+          tar -xvzf coverity_tool.tgz
 
       - name: Run Coverity Build
         run: |
-          $covPath = Get-ChildItem -Path "coverity" -Directory | Select-Object -First 1
-          & ".\coverity\$($covPath.Name)\bin\cov-build.exe" --dir cov-int dotnet build CoverityTestProject.csproj --configuration Release
-          Compress-Archive -Path cov-int -DestinationPath coverity-scan.zip
+          ./cov-analysis*/bin/cov-build --dir cov-int dotnet build --configuration Release
 
+      - name: Compress analysis results
+        run: tar czvf cov-int.tgz cov-int
       - name: Upload to Coverity
         run: |
-          curl --form token=${{ secrets.COVERITY_SCAN_TOKEN }} `
-               --form email=${{ secrets.COVERITY_SCAN_EMAIL }} `
-               --form file=@coverity-scan.zip `
-               --form version="1.0" `
-               --form description="Simple C# Console App Coverity Scan" `
-               https://scan.coverity.com/builds?project=Jubayer38%2FCoverityTestProject
+          curl --form token=${{ secrets.COVERITY_TOKEN }} \
+               --form email="mdjubayerhasan264@gmail.com" \
+               --form file=@cov-int.tgz \
+               --form version="v1.0.0" \
+               --form description="C# .NET Project Scan" \
+               https://scan.coverity.com/builds?project=${{ github.repository }}
+
